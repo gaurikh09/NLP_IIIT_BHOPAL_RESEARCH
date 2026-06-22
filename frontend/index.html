@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangla News Headline Generator</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="brand-icon">📰</span>
+            <span class="brand-text">Bangla Headline Generator</span>
+        </div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="javascript:void(0)" class="nav-link active" onclick="navigateTo('home')">Home</a></li>
+            <li><a href="javascript:void(0)" class="nav-link" onclick="navigateTo('generator')">Generator</a></li>
+            <li><a href="javascript:void(0)" class="nav-link" onclick="navigateTo('model-info')">Model Info</a></li>
+            <li><a href="javascript:void(0)" class="nav-link" onclick="navigateTo('results')">Results</a></li>
+            <li><a href="javascript:void(0)" class="nav-link" onclick="navigateTo('about')">About</a></li>
+        </ul>
+        <button class="mobile-menu-btn" onclick="document.getElementById('nav-links').classList.toggle('show')">&#9776;</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Page -->
+        <section id="page-home" class="page active">
+            <div class="hero">
+                <h1>বাংলা নিউজ হেডলাইন জেনারেটর</h1>
+                <p class="hero-subtitle">Powered by Fine-tuned mT5-Small Model</p>
+                <p class="hero-description">
+                    Generate accurate Bangla news headlines from full articles using state-of-the-art
+                    multilingual transformer technology trained on 50,000 news articles.
+                </p>
+                <button class="btn btn-primary btn-hero" onclick="navigateTo('generator')">Start Generating →</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">50,000</div>
+                    <div class="stat-label">Training Samples</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">mT5-Small</div>
+                    <div class="stat-label">Base Model</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">0.2555</div>
+                    <div class="stat-label">ROUGE-1 Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3 Epochs</div>
+                    <div class="stat-label">Training Rounds</div>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🤖</span>
+                    <h3>AI-Powered Generation</h3>
+                    <p>Fine-tuned mT5-small transformer trained on 50K Bangla news articles for 3 epochs with 512 token context</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>GPU Accelerated</h3>
+                    <p>NVIDIA RTX 4070 GPU inference with CUDA for fast headline generation using beam search</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>Quality Metrics</h3>
+                    <p>ROUGE-1: 0.26 | ROUGE-2: 0.11 | ROUGE-L: 0.25 evaluated on 500 validation samples</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">💾</span>
+                    <h3>History & Export</h3>
+                    <p>Save all predictions with timestamps, compare with actual headlines, export as CSV</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Generator Page -->
+        <section id="page-generator" class="page">
+            <h2 class="page-title">✨ Headline Generator</h2>
+            <p class="page-desc">Paste a full Bangla news article below and click Generate to create its headline. Use Ctrl+Enter for quick generation.</p>
+
+            <div class="generator-container">
+                <div class="input-section">
+                    <label for="article-input" class="input-label">Article Content (বাংলা আর্টিকেল)</label>
+                    <textarea
+                        id="article-input"
+                        class="article-textarea"
+                        placeholder="এখানে বাংলা নিউজ আর্টিকেল পেস্ট করুন...
+
+উদাহরণ: গাজীপুরের কালিয়াকৈর উপজেলার তেলিরচালা এলাকায় আজ বৃহস্পতিবার রাতের টিফিন খেয়ে একটি পোশাক কারখানার ৫০০ শ্রমিক অসুস্থ হয়ে পড়েছেন..."
+                        rows="10"
+                    ></textarea>
+
+                    <label for="actual-headline" class="input-label">Actual Headline - ঐচ্ছিক (for comparison)</label>
+                    <input
+                        id="actual-headline"
+                        type="text"
+                        class="headline-input"
+                        placeholder="আসল হেডলাইন এখানে লিখুন (optional - তুলনার জন্য)"
+                    />
+
+                    <div class="button-group">
+                        <button id="generate-btn" class="btn btn-primary" onclick="generateHeadline()">
+                            ✨ Generate Headline
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearGenerator()">
+                            🗑️ Clear
+                        </button>
+                        <button class="btn btn-secondary" onclick="loadSampleArticle()">
+                            📋 Load Sample
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div id="loading-spinner" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Generating headline using mT5 model... Please wait</p>
+                </div>
+
+                <!-- Error -->
+                <div id="error-message" class="error-message" style="display: none;"></div>
+
+                <!-- Output -->
+                <div id="output-section" class="output-section" style="display: none;">
+                    <div class="output-card">
+                        <div class="output-header">
+                            <h3 class="output-title">🎯 Generated Headline</h3>
+                            <button class="btn btn-small" onclick="copyHeadline()">📋 Copy</button>
+                        </div>
+                        <div class="output-headline" id="generated-headline"></div>
+
+                        <div id="actual-headline-display" class="actual-headline-section" style="display: none;">
+                            <h4>✓ Actual Headline (Reference)</h4>
+                            <div class="output-actual" id="actual-headline-output"></div>
+                        </div>
+
+                        <!-- Score Section -->
+                        <div class="score-section" id="score-section" style="display: none;">
+                            <h4>📊 Similarity Score</h4>
+                            <div class="score-bar-container">
+                                <div class="score-bar" id="score-bar"></div>
+                            </div>
+                            <span class="score-value" id="score-value"></span>
+                        </div>
+
+                        <div class="output-meta">
+                            <span class="meta-item">
+                                <span class="meta-label">Device</span>
+                                <span class="meta-value" id="output-device"></span>
+                            </span>
+                            <span class="meta-item">
+                                <span class="meta-label">Input Length</span>
+                                <span class="meta-value"><span id="output-length"></span> chars</span>
+                            </span>
+                            <span class="meta-item">
+                                <span class="meta-label">Model</span>
+                                <span class="meta-value">mT5-small</span>
+                            </span>
+                            <span class="meta-item">
+                                <span class="meta-label">Beam Size</span>
+                                <span class="meta-value">4</span>
+                            </span>
+                            <span class="meta-item">
+                                <span class="meta-label">Generated At</span>
+                                <span class="meta-value" id="output-time"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Info Page -->
+        <section id="page-model-info" class="page">
+            <h2 class="page-title">🔬 Model Information</h2>
+            <p class="page-desc">Details about the trained model, configuration, and evaluation performance.</p>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🧠 Model Architecture</h3>
+                    <div class="info-content">
+                        <div class="info-row"><span>Base Model</span><span>google/mt5-small</span></div>
+                        <div class="info-row"><span>Architecture</span><span>Encoder-Decoder (T5)</span></div>
+                        <div class="info-row"><span>Parameters</span><span>~300 Million</span></div>
+                        <div class="info-row"><span>Task</span><span>Text-to-Text Generation</span></div>
+                        <div class="info-row"><span>Language</span><span>Bangla (bn)</span></div>
+                        <div class="info-row"><span>Framework</span><span>PyTorch + HuggingFace</span></div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>⚙️ Training Configuration</h3>
+                    <div class="info-content">
+                        <div class="info-row"><span>Epochs</span><span>3</span></div>
+                        <div class="info-row"><span>Batch Size</span><span>4 (effective)</span></div>
+                        <div class="info-row"><span>Learning Rate</span><span>5e-5</span></div>
+                        <div class="info-row"><span>Optimizer</span><span>AdamW</span></div>
+                        <div class="info-row"><span>Max Input Tokens</span><span>512</span></div>
+                        <div class="info-row"><span>Max Output Tokens</span><span>64</span></div>
+                        <div class="info-row"><span>Warmup Steps</span><span>500</span></div>
+                        <div class="info-row"><span>Total Steps</span><span>33,750</span></div>
+                        <div class="info-row"><span>Training Duration</span><span>~4 hours</span></div>
+                        <div class="info-row"><span>GPU</span><span>NVIDIA RTX 4070</span></div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>📁 Dataset Statistics</h3>
+                    <div class="info-content">
+                        <div class="info-row"><span>Dataset</span><span>Bangla Newspaper</span></div>
+                        <div class="info-row"><span>Total Available</span><span>437,948 articles</span></div>
+                        <div class="info-row"><span>Used for Training</span><span>50,000</span></div>
+                        <div class="info-row"><span>Train Split</span><span>45,000 (90%)</span></div>
+                        <div class="info-row"><span>Validation Split</span><span>5,000 (10%)</span></div>
+                        <div class="info-row"><span>Min Content Length</span><span>100 characters</span></div>
+                        <div class="info-row"><span>Avg Article Length</span><span>1,871 chars</span></div>
+                        <div class="info-row"><span>Avg Headline Length</span><span>32 chars</span></div>
+                    </div>
+                </div>
+
+                <div class="info-card highlight-card">
+                    <h3>📊 Evaluation Scores</h3>
+                    <div class="info-content">
+                        <div class="info-row"><span>ROUGE-1 (Unigram)</span><span class="score-good">0.2555</span></div>
+                        <div class="info-row"><span>ROUGE-2 (Bigram)</span><span class="score-good">0.1091</span></div>
+                        <div class="info-row"><span>ROUGE-L (LCS)</span><span class="score-good">0.2509</span></div>
+                        <div class="info-row"><span>Best ROUGE-1</span><span class="score-good">1.0000</span></div>
+                        <div class="info-row"><span>Eval Samples</span><span>500</span></div>
+                        <div class="info-row"><span>Final Train Loss</span><span>2.3005</span></div>
+                        <div class="info-row"><span>Eval Loss</span><span>1.7614</span></div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>🖥️ System Status</h3>
+                    <div id="system-info" class="info-content">
+                        <p class="loading-text">Click button to check...</p>
+                    </div>
+                    <button class="btn btn-small" style="margin-top:1rem" onclick="loadSystemInfo()">Check Status</button>
+                </div>
+
+                <div class="info-card">
+                    <h3>📈 Training Progress</h3>
+                    <div class="info-content">
+                        <div class="info-row"><span>Loss (Start)</span><span>23.45</span></div>
+                        <div class="info-row"><span>Loss (End Epoch 1)</span><span>~2.15</span></div>
+                        <div class="info-row"><span>Loss (End Epoch 2)</span><span>~1.85</span></div>
+                        <div class="info-row"><span>Loss (End Epoch 3)</span><span>~1.70</span></div>
+                        <div class="info-row"><span>Gradient Norm</span><span>~8.0 (stable)</span></div>
+                        <div class="info-row"><span>Convergence</span><span>✓ Converged</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Page -->
+        <section id="page-results" class="page">
+            <h2 class="page-title">📋 Prediction History</h2>
+            <p class="page-desc">All generated headlines are saved here. Export as CSV or clear history.</p>
+
+            <div class="results-actions">
+                <button class="btn btn-secondary" onclick="loadPredictions()">🔄 Refresh</button>
+                <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+                <button class="btn btn-danger" onclick="clearPredictions()">🗑️ Clear All</button>
+            </div>
+
+            <div id="results-container" class="results-container">
+                <p class="no-results">No predictions yet. Go to Generator and create some headlines!</p>
+            </div>
+        </section>
+
+        <!-- About Page -->
+        <section id="page-about" class="page">
+            <h2 class="page-title">ℹ️ About This Project</h2>
+            <p class="page-desc">End-to-end Bangla news headline generation using multilingual transformers.</p>
+
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>📝 Project Overview</h3>
+                    <p>
+                        This is an end-to-end NLP application that automatically generates Bangla news
+                        headlines from full Bangla news articles using a fine-tuned mT5-small model.
+                        The system is trained on the Bangla Newspaper Dataset containing 50,000 article-headline pairs
+                        for 3 epochs with 512 token input context on an NVIDIA RTX 4070 GPU.
+                    </p>
+                </div>
+
+                <div class="about-card">
+                    <h3>🛠️ Technology Stack</h3>
+                    <ul class="tech-list">
+                        <li>🐍 Python 3.12</li>
+                        <li>🤗 HuggingFace Transformers 4.x</li>
+                        <li>🔥 PyTorch 2.x + CUDA</li>
+                        <li>⚡ FastAPI + Uvicorn</li>
+                        <li>🌐 HTML5 / CSS3 / JavaScript</li>
+                        <li>📊 ROUGE-Score + NLTK (BLEU)</li>
+                        <li>🖥️ NVIDIA RTX 4070 Laptop GPU</li>
+                        <li>📄 FPDF2 (Report Generation)</li>
+                    </ul>
+                </div>
+
+                <div class="about-card">
+                    <h3>🔄 How It Works</h3>
+                    <p>The model uses the text-to-text paradigm:</p>
+                    <div class="code-block">
+                        <code>Input:  headline: &lt;full_article_text&gt;</code><br>
+                        <code>Output: &lt;generated_headline&gt;</code>
+                    </div>
+                    <p style="margin-top:0.75rem; font-size:0.85rem; color:var(--text-secondary)">
+                        The encoder processes the full article (up to 512 tokens), and the decoder generates
+                        the headline using beam search (4 beams) with no-repeat ngram constraint.
+                    </p>
+                </div>
+
+                <div class="about-card">
+                    <h3>🌐 API Endpoints</h3>
+                    <div class="api-list">
+                        <div class="api-item">
+                            <span class="method post">POST</span>
+                            <span class="endpoint">/generate</span>
+                            <span class="desc">Generate headline from article</span>
+                        </div>
+                        <div class="api-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint">/health</span>
+                            <span class="desc">Health check + device info</span>
+                        </div>
+                        <div class="api-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint">/model-info</span>
+                            <span class="desc">Model metadata</span>
+                        </div>
+                        <div class="api-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint">/training-metrics</span>
+                            <span class="desc">Training loss & scores</span>
+                        </div>
+                        <div class="api-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint">/predictions</span>
+                            <span class="desc">Prediction history</span>
+                        </div>
+                        <div class="api-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint">/predictions/export</span>
+                            <span class="desc">Download CSV</span>
+                        </div>
+                        <div class="api-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint">/docs</span>
+                            <span class="desc">Swagger Interactive Docs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Bangla News Headline Generator &bull; mT5-Small Fine-tuned &bull; FastAPI + PyTorch &bull; ROUGE-1: 0.2555</p>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+</html>

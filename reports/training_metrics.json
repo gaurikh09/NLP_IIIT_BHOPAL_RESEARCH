@@ -1,0 +1,19 @@
+{
+  "train_loss": 2.300526453540943,
+  "train_runtime": 14227.2973,
+  "train_samples_per_second": 9.489,
+  "total_steps": 33750,
+  "epochs": 3,
+  "batch_size": 4,
+  "learning_rate": 5e-05,
+  "training_duration": "3:57:07.500227",
+  "device": "cuda",
+  "model_name": "google/mt5-small",
+  "train_samples": 45000,
+  "val_samples": 5000,
+  "timestamp": "2026-06-23 03:26:52",
+  "eval_loss": 1.639155387878418,
+  "eval_rouge1": 0.001,
+  "eval_rouge2": 0.0,
+  "eval_rougeL": 0.001
+}
